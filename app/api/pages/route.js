@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import crypto from "node:crypto";
 import { getPageByUsername, createPage, rateLimit, countPages, maxSpots } from "@/lib/db";
-import { RESERVED, isValidHandle, isValidEmail, parseLinks } from "@/lib/util";
+import { RESERVED, isValidHandle, isValidEmail, parseLinks, MAX_LINKS } from "@/lib/util";
 import { clientIp } from "@/lib/auth";
 
 export const runtime = "nodejs";
@@ -52,6 +52,11 @@ export async function POST(req) {
   if (valid.length === 0)
     return NextResponse.json(
       { error: "Add at least one Spotify Blend invite link (spotify.link/…)." },
+      { status: 400 }
+    );
+  if (valid.length > MAX_LINKS)
+    return NextResponse.json(
+      { error: `You can add at most ${MAX_LINKS} blend links.` },
       { status: 400 }
     );
 

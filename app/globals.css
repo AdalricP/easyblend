@@ -206,18 +206,38 @@ input:focus, textarea:focus { border-color: var(--green); box-shadow: 0 0 0 3px 
 .made-note a { color: inherit; text-decoration: none; }
 .made-note a:hover { color: var(--ink); text-decoration: underline; text-underline-offset: 2px; }
 
-/* /meme.jpg — the meme, centered */
+/* /meme.jpg — the meme, centered, with caption overlays */
 .meme-wrap { margin: auto; position: relative; z-index: 1; text-align: center; }
+.meme-frame {
+  position: relative;
+  display: inline-block;
+  container-type: inline-size;
+  max-width: min(92vw, 540px);
+}
 .meme-img {
   display: block;
   width: 100%;
-  max-width: min(92vw, 540px);
-  max-height: 82vh;
   height: auto;
-  object-fit: contain;
   border-radius: 14px;
   border: 1px solid var(--line);
 }
+.meme-cap {
+  position: absolute;
+  left: 0; right: 0;
+  padding: 0 4%;
+  text-align: center;
+  font-family: Impact, "Arial Black", "Helvetica Neue", sans-serif;
+  font-weight: 900;
+  text-transform: uppercase;
+  line-height: 1.02;
+  letter-spacing: 0.3px;
+  color: #fff;
+  -webkit-text-stroke: 3px #000;
+  paint-order: stroke fill;
+  font-size: clamp(12px, 4.4cqw, 22px);
+}
+.meme-cap.top { top: 1.5%; }
+.meme-cap.bot { top: 49.5%; }
 
 /* ── Copy boxes ────────────────────────────────────────────────────────── */
 .copybox {
@@ -243,6 +263,7 @@ input:focus, textarea:focus { border-color: var(--green); box-shadow: 0 0 0 3px 
 /* ── Link validation feedback ──────────────────────────────────────────── */
 .linkstatus { margin-top: 10px; font-family: var(--mono); font-size: 12px; line-height: 1.5; }
 .ls-ok { color: #157a38; font-weight: 700; }
+.ls-warn { color: #b4262b; font-weight: 700; }
 .ls-bad {
   margin-top: 8px; background: #fdeceb; border: 1px solid #f0b6b2; color: #b4262b;
   border-radius: 10px; padding: 10px 12px;

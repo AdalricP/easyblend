@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Wordmark from "./_components/Wordmark";
 import LinkStatus from "./_components/LinkStatus";
-import { parseLinks, isValidHandle } from "@/lib/util";
+import { parseLinks, isValidHandle, MAX_LINKS } from "@/lib/util";
 
 export default function CreatePage() {
   const [handle, setHandle] = useState("");
@@ -50,7 +50,8 @@ export default function CreatePage() {
   }
 
   const parsed = parseLinks(links);
-  const linksReady = parsed.valid.length > 0 && parsed.invalid.length === 0;
+  const linksReady =
+    parsed.valid.length > 0 && parsed.valid.length <= MAX_LINKS && parsed.invalid.length === 0;
   const handleBad = handle.length > 0 && !isValidHandle(handle);
   const full = spots?.full;
 

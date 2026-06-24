@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getPageByUsername, updatePage, rateLimit } from "@/lib/db";
-import { isValidEmail, parseLinks } from "@/lib/util";
+import { isValidEmail, parseLinks, MAX_LINKS } from "@/lib/util";
 import { safeEqual, clientIp } from "@/lib/auth";
 
 export const runtime = "nodejs";
@@ -61,6 +61,11 @@ export async function PUT(req, { params }) {
   if (valid.length === 0)
     return NextResponse.json(
       { error: "Add at least one Spotify Blend invite link." },
+      { status: 400 }
+    );
+  if (valid.length > MAX_LINKS)
+    return NextResponse.json(
+      { error: `You can add at most ${MAX_LINKS} blend links.` },
       { status: 400 }
     );
 

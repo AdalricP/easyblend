@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Wordmark from "../_components/Wordmark";
 import LinkStatus from "../_components/LinkStatus";
-import { parseLinks } from "@/lib/util";
+import { parseLinks, MAX_LINKS } from "@/lib/util";
 
 export default function ManagePage() {
   const [creds, setCreds] = useState(null); // { u, token }
@@ -74,7 +74,8 @@ export default function ManagePage() {
   }
 
   const parsed = parseLinks(links);
-  const linksReady = parsed.valid.length > 0 && parsed.invalid.length === 0;
+  const linksReady =
+    parsed.valid.length > 0 && parsed.valid.length <= MAX_LINKS && parsed.invalid.length === 0;
 
   if (status === "loading") {
     return (
