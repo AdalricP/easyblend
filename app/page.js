@@ -6,7 +6,6 @@ import LinkStatus from "./_components/LinkStatus";
 import TampermonkeyLogo from "./_components/TampermonkeyLogo";
 import { parseLinks, isValidHandle, MAX_LINKS } from "@/lib/util";
 
-const BLEND_INVITE_URL = "https://open.spotify.com/blend/invitation";
 const TM_INSTALL_URL = "https://www.tampermonkey.net/";
 
 export default function CreatePage() {
@@ -18,7 +17,6 @@ export default function CreatePage() {
   const [result, setResult] = useState(null);
   const [origin, setOrigin] = useState("");
   const [spots, setSpots] = useState(null);
-  const [scriptInstalled, setScriptInstalled] = useState(false);
 
   // Prefill the username if someone arrived via a "claim this" link.
   useEffect(() => {
@@ -29,28 +27,6 @@ export default function CreatePage() {
       .then((r) => r.json())
       .then(setSpots)
       .catch(() => {});
-  }, []);
-
-  // Detect whether the Tampermonkey userscript is installed — it tags the page
-  // with a marker (and fires an event) when it runs on easyblend.
-  useEffect(() => {
-    const has = () =>
-      !!document.documentElement.getAttribute("data-eb-userscript") ||
-      !!window.__EASYBLEND_USERSCRIPT__;
-    if (has()) return setScriptInstalled(true);
-    const onEvent = () => setScriptInstalled(true);
-    window.addEventListener("easyblend:userscript", onEvent);
-    let n = 0;
-    const id = setInterval(() => {
-      if (has() || ++n > 6) {
-        if (has()) setScriptInstalled(true);
-        clearInterval(id);
-      }
-    }, 300);
-    return () => {
-      window.removeEventListener("easyblend:userscript", onEvent);
-      clearInterval(id);
-    };
   }, []);
 
   async function submit(e) {
@@ -150,20 +126,10 @@ export default function CreatePage() {
             />
             <div className="or-sep">or</div>
             <div className="tm-col">
-              <a
-                className="tm-btn"
-                href={scriptInstalled ? BLEND_INVITE_URL : TM_INSTALL_URL}
-                target="_blank"
-                rel="noreferrer"
-              >
+              <a className="tm-btn" href={TM_INSTALL_URL} target="_blank" rel="noreferrer">
                 Use Tampermonkey
                 <TampermonkeyLogo />
               </a>
-              {!scriptInstalled && (
-                <a className="tm-sub" href="/easyblend.user.js" target="_blank" rel="noreferrer">
-                  already have it? add the script
-                </a>
-              )}
             </div>
           </div>
           <LinkStatus
