@@ -173,12 +173,12 @@ export default function CreatePage() {
                 </a>
               ) : (
                 <>
-                  <a className="tm-btn" href="/easyblend.user.js" target="_blank" rel="noreferrer">
-                    Use Tampermonkey
+                  <a className="tm-btn" href={TM_INSTALL_URL} target="_blank" rel="noreferrer">
+                    Install Tampermonkey
                     <TampermonkeyLogo />
                   </a>
-                  <a className="tm-sub" href={TM_INSTALL_URL} target="_blank" rel="noreferrer">
-                    install here
+                  <a className="tm-script" href="/easyblend.user.js" target="_blank" rel="noreferrer">
+                    Add the script
                   </a>
                 </>
               )}

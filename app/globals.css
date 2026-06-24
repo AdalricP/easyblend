@@ -201,11 +201,15 @@ input:focus, textarea:focus { border-color: var(--green); box-shadow: 0 0 0 3px 
 .tm-btn:hover .tm-logo { filter: none; }             /* dark logo on the white bg */
 .tm-btn svg, .tm-logo { flex: none; }
 .tm-logo { width: 18px; height: 18px; display: block; filter: invert(1); }
-.tm-sub {
-  margin-top: 10px; font-size: 12px; font-weight: 600; color: var(--ink);
-  text-align: center; text-decoration: underline; text-underline-offset: 2px;
+.tm-script {
+  display: block; text-align: center; margin-top: 9px;
+  background: #fff; color: var(--ink);
+  border: 1.5px solid #121212; border-radius: 11px;
+  font-family: var(--sans); font-weight: 700; font-size: 12.5px;
+  padding: 11px 12px; text-decoration: none;
+  transition: background 0.14s ease, color 0.14s ease;
 }
-.tm-sub:hover { color: var(--green); }
+.tm-script:hover { background: #121212; color: #fff; }
 
 /* installed → "Go Spotify": green wipes up from the bottom, content fades in */
 .tm-btn.go { position: relative; overflow: hidden; background: #121212; color: #000; border-color: #121212; }
