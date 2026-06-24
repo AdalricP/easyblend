@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Wordmark from "./_components/Wordmark";
 import LinkStatus from "./_components/LinkStatus";
-import { parseLinks } from "@/lib/util";
+import { parseLinks, isValidHandle } from "@/lib/util";
 
 export default function CreatePage() {
   const [handle, setHandle] = useState("");
@@ -51,6 +51,7 @@ export default function CreatePage() {
 
   const parsed = parseLinks(links);
   const linksReady = parsed.valid.length > 0 && parsed.invalid.length === 0;
+  const handleBad = handle.length > 0 && !isValidHandle(handle);
   const full = spots?.full;
 
   if (result) {
@@ -75,10 +76,6 @@ export default function CreatePage() {
           </div>
         )}
         <h1>One link to a fresh blend.</h1>
-        <p className="lede">
-          Claim your page, drop in your Spotify Blend invites, and share a single link.
-          Each invite is handed out once — when the pool runs dry we email you to refill.
-        </p>
       </div>
 
       <form className="panel" onSubmit={submit}>
@@ -99,7 +96,9 @@ export default function CreatePage() {
               onChange={(e) => setHandle(e.target.value.replace(/\s/g, ""))}
             />
           </div>
-          <p className="hint">Letters, numbers, dot, dash or underscore. 2–30 characters.</p>
+          {handleBad && (
+            <p className="field-err">Letters, numbers, dot, dash or underscore · 2–30 characters</p>
+          )}
         </div>
 
         <div className="field">
@@ -114,7 +113,6 @@ export default function CreatePage() {
             spellCheck={false}
             onChange={(e) => setEmail(e.target.value)}
           />
-          <p className="hint">We&apos;ll email you when your last invite is claimed so you can refill.</p>
         </div>
 
         <div className="field">
@@ -125,10 +123,6 @@ export default function CreatePage() {
             value={links}
             onChange={(e) => setLinks(e.target.value)}
           />
-          <p className="hint">
-            One link per line. In Spotify, open your Blend → <strong>Invite</strong> → copy
-            link, and paste a batch here. Each is used once, then removed.
-          </p>
           <LinkStatus
             valid={parsed.valid}
             invalid={parsed.invalid}
@@ -136,13 +130,17 @@ export default function CreatePage() {
           />
         </div>
 
-        <button className="btn block" type="submit" disabled={busy || !linksReady || full}>
+        <button
+          className="btn block"
+          type="submit"
+          disabled={busy || !linksReady || full || !isValidHandle(handle)}
+        >
           {busy ? "Creating…" : full ? "All spots taken" : "Create my page"}
         </button>
       </form>
 
       <p className="footnote">
-        Lost your manage link? <a href="/recover">Recover it</a>.
+        <a href="/recover">Forgor account details</a>
       </p>
     </div>
   );
