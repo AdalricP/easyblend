@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { sendTestEmail } from "@/lib/email";
+import { safeEqual } from "@/lib/auth";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -16,7 +17,7 @@ export async function GET(req) {
     );
 
   const { searchParams } = new URL(req.url);
-  if (searchParams.get("token") !== secret)
+  if (!safeEqual(searchParams.get("token") || "", secret))
     return NextResponse.json({ error: "Invalid token" }, { status: 403 });
 
   const to = searchParams.get("to");

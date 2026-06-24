@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import crypto from "node:crypto";
 import { getPageByUsername, createPage } from "@/lib/db";
-import { RESERVED, isValidHandle, isValidEmail, normalizeLinks } from "@/lib/util";
+import { RESERVED, isValidHandle, isValidEmail, parseLinks } from "@/lib/util";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -31,10 +31,18 @@ export async function POST(req) {
       { status: 400 }
     );
 
-  const cleanLinks = normalizeLinks(links);
-  if (cleanLinks.length === 0)
+  const { valid, invalid } = parseLinks(links);
+  if (invalid.length)
     return NextResponse.json(
-      { error: "Add at least one valid link (http(s):// or spotify:)." },
+      {
+        error: `${invalid.length} ${invalid.length === 1 ? "link isn't a" : "links aren't"} Spotify link${invalid.length === 1 ? "" : "s"}. Only spotify.link / open.spotify.com URLs are allowed.`,
+        invalid: invalid.slice(0, 10),
+      },
+      { status: 400 }
+    );
+  if (valid.length === 0)
+    return NextResponse.json(
+      { error: "Add at least one Spotify Blend invite link (spotify.link/…)." },
       { status: 400 }
     );
 
@@ -42,12 +50,21 @@ export async function POST(req) {
     return NextResponse.json({ error: "That username is already taken." }, { status: 409 });
 
   const editToken = crypto.randomBytes(24).toString("hex");
-  await createPage({
-    handle,
-    email: email.trim(),
-    editToken,
-    links: cleanLinks,
-  });
+  try {
+    await createPage({
+      handle,
+      email: email.trim(),
+      editToken,
+      links: valid,
+    });
+  } catch (e) {
+    // Two concurrent creates of the same handle race past the check above; the
+    // UNIQUE constraint catches the loser. Surface it as "taken", not a 500.
+    if (String(e?.message || "").toLowerCase().includes("unique"))
+      return NextResponse.json({ error: "That username is already taken." }, { status: 409 });
+    console.error("[create] failed:", e?.message || e);
+    return NextResponse.json({ error: "Could not create page. Try again." }, { status: 500 });
+  }
 
   return NextResponse.json({
     ok: true,

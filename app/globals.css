@@ -216,3 +216,17 @@ textarea {
 .copy-btn:hover { background: var(--accent-hover); }
 
 .row { display: flex; gap: 10px; margin-top: 20px; }
+
+/* ── Link validation feedback ──────────────────────────────────────────── */
+.linkstatus { margin-top: 9px; font-size: 12.5px; line-height: 1.5; }
+.ls-ok { color: #1a7f3c; font-weight: 600; }
+.ls-bad {
+  margin-top: 8px;
+  background: #fdecec;
+  border: 1px solid #f3c2c2;
+  color: #a63232;
+  border-radius: 10px;
+  padding: 10px 12px;
+}
+.ls-bad ul { margin: 6px 0 0; padding-left: 18px; }
+.ls-bad li { font-family: var(--mono); font-size: 12px; word-break: break-all; }

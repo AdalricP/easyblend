@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import Wordmark from "./_components/Wordmark";
+import LinkStatus from "./_components/LinkStatus";
+import { parseLinks } from "@/lib/util";
 
 export default function CreatePage() {
   const [handle, setHandle] = useState("");
@@ -41,6 +43,9 @@ export default function CreatePage() {
       setBusy(false);
     }
   }
+
+  const parsed = parseLinks(links);
+  const linksReady = parsed.valid.length > 0 && parsed.invalid.length === 0;
 
   if (result) {
     return (
@@ -110,9 +115,14 @@ export default function CreatePage() {
             One link per line. In Spotify, open your Blend → <strong>Invite</strong> → copy
             link, and paste a batch here. Each is used once, then removed.
           </p>
+          <LinkStatus
+            valid={parsed.valid}
+            invalid={parsed.invalid}
+            show={links.trim().length > 0}
+          />
         </div>
 
-        <button className="btn block" type="submit" disabled={busy}>
+        <button className="btn block" type="submit" disabled={busy || !linksReady}>
           {busy ? "Creating…" : "Create my page"}
         </button>
       </form>

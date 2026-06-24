@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import Wordmark from "../_components/Wordmark";
+import LinkStatus from "../_components/LinkStatus";
+import { parseLinks } from "@/lib/util";
 
 export default function ManagePage() {
   const [creds, setCreds] = useState(null); // { u, token }
@@ -71,6 +73,9 @@ export default function ManagePage() {
     }
   }
 
+  const parsed = parseLinks(links);
+  const linksReady = parsed.valid.length > 0 && parsed.invalid.length === 0;
+
   if (status === "loading") {
     return (
       <div className="card">
@@ -138,9 +143,14 @@ export default function ManagePage() {
             One link per line. These are the invites still waiting to be handed out — used
             ones are already gone. Paste fresh ones to refill.
           </p>
+          <LinkStatus
+            valid={parsed.valid}
+            invalid={parsed.invalid}
+            show={links.trim().length > 0}
+          />
         </div>
 
-        <button className="btn block" type="submit" disabled={busy}>
+        <button className="btn block" type="submit" disabled={busy || !linksReady}>
           {busy ? "Saving…" : saved ? "Saved ✓" : "Save changes"}
         </button>
       </form>
