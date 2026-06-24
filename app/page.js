@@ -132,11 +132,14 @@ export default function CreatePage() {
             onChange={(e) => setLinks(e.target.value)}
             onPaste={onLinksPaste}
           />
-          <p className="hint">
-            In Spotify: open a Blend → <strong>Invite</strong> → <strong>Copy link</strong>, then
-            paste here — we keep just the link, no need to trim the text. Repeat for each (up to{" "}
-            {MAX_LINKS}).
-          </p>
+          <a
+            className="blend-link"
+            href="https://open.spotify.com/blend/invitation"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Make a Spotify Blend ↗
+          </a>
           <LinkStatus
             valid={parsed.valid}
             invalid={parsed.invalid}
