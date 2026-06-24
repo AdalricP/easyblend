@@ -3,12 +3,7 @@
 import { useEffect, useState } from "react";
 import Wordmark from "./_components/Wordmark";
 import LinkStatus from "./_components/LinkStatus";
-import TampermonkeyLogo from "./_components/TampermonkeyLogo";
-import SpotifyLogo from "./_components/SpotifyLogo";
 import { parseLinks, isValidHandle, MAX_LINKS } from "@/lib/util";
-
-const TM_INSTALL_URL = "https://www.tampermonkey.net/";
-const BLEND_INVITE_URL = "https://open.spotify.com/blend/invitation";
 
 export default function CreatePage() {
   const [handle, setHandle] = useState("");
@@ -19,41 +14,6 @@ export default function CreatePage() {
   const [result, setResult] = useState(null);
   const [origin, setOrigin] = useState("");
   const [spots, setSpots] = useState(null);
-  const [scriptInstalled, setScriptInstalled] = useState(false);
-
-  // Detect our userscript — it tags the page when it runs on easyblend. (We can
-  // detect our own script reliably; the bare extension is undetectable.) A short
-  // delay lets the black button show first, so the flip-to-green reads as a change.
-  useEffect(() => {
-    let flipped = false;
-    const has = () =>
-      !!document.documentElement.getAttribute("data-eb-userscript") ||
-      !!window.__EASYBLEND_USERSCRIPT__;
-    const flip = () => {
-      if (flipped) return;
-      flipped = true;
-      setTimeout(() => setScriptInstalled(true), 600);
-    };
-    if (has()) {
-      flip();
-      return;
-    }
-    const onEvent = () => flip();
-    window.addEventListener("easyblend:userscript", onEvent);
-    let n = 0;
-    const id = setInterval(() => {
-      if (has()) {
-        flip();
-        clearInterval(id);
-      } else if (++n > 8) {
-        clearInterval(id);
-      }
-    }, 300);
-    return () => {
-      window.removeEventListener("easyblend:userscript", onEvent);
-      clearInterval(id);
-    };
-  }, []);
 
   // Prefill the username if someone arrived via a "claim this" link.
   useEffect(() => {
@@ -165,60 +125,18 @@ export default function CreatePage() {
 
         <div className="field">
           <label htmlFor="links">Spotify Blend invite links</label>
-          <div className="links-row">
-            <div className="manual-col">
-              <span className="manual-label">Enter manually</span>
-              <textarea
-                id="links"
-                placeholder={"paste the copied link — we keep just the link\n\nhttps://spotify.link/abc123\nhttps://spotify.link/def456"}
-                value={links}
-                onChange={(e) => setLinks(e.target.value)}
-                onPaste={onLinksPaste}
-              />
-            </div>
-            <div className="or-sep">or</div>
-            <div className="tm-col">
-              <a
-                className={`tm-btn${scriptInstalled ? " go" : ""}`}
-                href={scriptInstalled ? BLEND_INVITE_URL : TM_INSTALL_URL}
-                target="_blank"
-                rel="noreferrer"
-              >
-                {scriptInstalled ? (
-                  <>
-                    <span className="tm-fill" />
-                    <span className="tm-content">
-                      <SpotifyLogo />
-                      <span>Spotify w/ Tampermonkey</span>
-                    </span>
-                  </>
-                ) : (
-                  <>
-                    Install Tampermonkey
-                    <TampermonkeyLogo />
-                  </>
-                )}
-              </a>
-              <div className={`tm-extras${scriptInstalled ? " gone" : ""}`}>
-                <span className="tm-then">then</span>
-                <a className="tm-script" href="/easyblend.user.js" target="_blank" rel="noreferrer">
-                  Add the script
-                </a>
-                <details className="tm-help">
-                  <summary>installed but not running?</summary>
-                  <div>
-                    Chrome / Brave / Edge block userscripts by default:
-                    <ol>
-                      <li>open <code>…/extensions</code></li>
-                      <li>Tampermonkey → <strong>Details</strong></li>
-                      <li>turn on <strong>Allow user scripts</strong></li>
-                      <li>reload this page</li>
-                    </ol>
-                  </div>
-                </details>
-              </div>
-            </div>
-          </div>
+          <textarea
+            id="links"
+            placeholder={"https://spotify.link/abc123\nhttps://spotify.link/def456\nhttps://spotify.link/ghi789"}
+            value={links}
+            onChange={(e) => setLinks(e.target.value)}
+            onPaste={onLinksPaste}
+          />
+          <p className="hint">
+            In Spotify: open a Blend → <strong>Invite</strong> → <strong>Copy link</strong>, then
+            paste here — we keep just the link, no need to trim the text. Repeat for each (up to{" "}
+            {MAX_LINKS}).
+          </p>
           <LinkStatus
             valid={parsed.valid}
             invalid={parsed.invalid}
