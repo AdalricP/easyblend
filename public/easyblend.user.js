@@ -1,10 +1,10 @@
 // ==UserScript==
 // @name         easyblend · grab blend links
 // @namespace    https://easyblend.xyz
-// @version      0.4.0
+// @version      0.4.1
 // @description  Grab up to 10 fresh Spotify Blend invite links to paste into easyblend.xyz
 // @author       easyblend
-// @match        https://open.spotify.com/blend/invitation*
+// @match        https://open.spotify.com/*
 // @match        https://easyblend.xyz/*
 // @match        https://*.easyblend.xyz/*
 // @icon         https://easyblend.xyz/favicon.ico
@@ -14,7 +14,7 @@
 
 (function () {
   "use strict";
-  const VERSION = "0.4.0";
+  const VERSION = "0.4.1";
 
   // ── On easyblend: announce presence so the site can detect the script ──
   if (location.hostname.indexOf("easyblend") !== -1) {
@@ -152,6 +152,11 @@
     });
   }
 
-  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
-  else init();
+  console.log("[easyblend] userscript v" + VERSION + " on Spotify — path: " + location.pathname);
+  if (/blend/i.test(location.pathname)) {
+    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
+    else init();
+  } else {
+    console.log("[easyblend] not a blend page — panel not injected.");
+  }
 })();

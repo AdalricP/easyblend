@@ -131,7 +131,11 @@ h1 {
   font-weight: 700;
   color: var(--ink);
   margin-bottom: 20px;
+  min-height: 16px;          /* reserve space so it doesn't shift layout */
+  opacity: 0;
+  transition: opacity 0.4s ease;
 }
+.spots.ready { opacity: 1; }
 
 .panel {
   background: var(--card);

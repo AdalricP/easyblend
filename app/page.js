@@ -89,6 +89,19 @@ export default function CreatePage() {
     }
   }
 
+  // Smart paste: drop the whole "X invited you to a Spotify Blend <link>" string
+  // in and we keep just the link(s), appended one per line. Paste 10× and done.
+  function onLinksPaste(e) {
+    const text = e.clipboardData.getData("text") || "";
+    const found = text.match(/https?:\/\/(?:spotify\.link|open\.spotify\.com)\/[^\s"'<>]+/gi);
+    if (!found) return; // nothing Spotify-shaped — let the normal paste happen
+    e.preventDefault();
+    setLinks((prev) => {
+      const base = prev.replace(/\s+$/, "");
+      return (base ? base + "\n" : "") + found.join("\n") + "\n";
+    });
+  }
+
   const parsed = parseLinks(links);
   const linksReady =
     parsed.valid.length > 0 && parsed.valid.length <= MAX_LINKS && parsed.invalid.length === 0;
@@ -108,11 +121,9 @@ export default function CreatePage() {
     <div className="wrap">
       <Wordmark />
       <div className="hero">
-        {spots && (
-          <div className="spots">
-            {spots.remaining}/{spots.max} spots left
-          </div>
-        )}
+        <div className={`spots${spots ? " ready" : ""}`}>
+          {spots ? `${spots.remaining}/${spots.max} spots left` : ""}
+        </div>
       </div>
 
       <form className="panel" onSubmit={submit}>
@@ -159,9 +170,10 @@ export default function CreatePage() {
               <span className="manual-label">Enter manually</span>
               <textarea
                 id="links"
-                placeholder={"https://spotify.link/abc123\nhttps://spotify.link/def456\nhttps://spotify.link/ghi789"}
+                placeholder={"paste the copied link — we keep just the link\n\nhttps://spotify.link/abc123\nhttps://spotify.link/def456"}
                 value={links}
                 onChange={(e) => setLinks(e.target.value)}
+                onPaste={onLinksPaste}
               />
             </div>
             <div className="or-sep">or</div>
