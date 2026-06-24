@@ -3,7 +3,10 @@
 import { useEffect, useState } from "react";
 import Wordmark from "./_components/Wordmark";
 import LinkStatus from "./_components/LinkStatus";
+import TampermonkeyLogo from "./_components/TampermonkeyLogo";
 import { parseLinks, isValidHandle, MAX_LINKS } from "@/lib/util";
+
+const BLEND_INVITE_URL = "https://open.spotify.com/blend/invitation";
 
 export default function CreatePage() {
   const [handle, setHandle] = useState("");
@@ -114,12 +117,27 @@ export default function CreatePage() {
 
         <div className="field">
           <label htmlFor="links">Spotify Blend invite links</label>
-          <textarea
-            id="links"
-            placeholder={"https://spotify.link/abc123\nhttps://spotify.link/def456\nhttps://spotify.link/ghi789"}
-            value={links}
-            onChange={(e) => setLinks(e.target.value)}
-          />
+          <div className="links-row">
+            <textarea
+              id="links"
+              placeholder={"https://spotify.link/abc123\nhttps://spotify.link/def456\nhttps://spotify.link/ghi789"}
+              value={links}
+              onChange={(e) => setLinks(e.target.value)}
+            />
+            <div className="or-sep">or</div>
+            <div className="tm-col">
+              <a className="tm-btn" href={BLEND_INVITE_URL} target="_blank" rel="noreferrer">
+                Use Tampermonkey
+                <TampermonkeyLogo />
+              </a>
+              <span className="tm-cap">
+                first time?{" "}
+                <a href="/easyblend.user.js" target="_blank" rel="noreferrer">
+                  install the script
+                </a>
+              </span>
+            </div>
+          </div>
           <LinkStatus
             valid={parsed.valid}
             invalid={parsed.invalid}

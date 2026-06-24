@@ -171,6 +171,38 @@ input::placeholder, textarea::placeholder { color: #aeaeae; }
 input:focus, textarea:focus { border-color: var(--green); box-shadow: 0 0 0 3px rgba(29, 185, 84, 0.15); }
 
 .field { margin-bottom: 20px; }
+
+/* links textarea  ·or·  Use Tampermonkey */
+.links-row { display: flex; align-items: stretch; gap: 14px; }
+.links-row textarea { flex: 1; min-height: 132px; }
+.or-sep {
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--mono); font-size: 12px; font-weight: 700;
+  color: #b3b3b3; letter-spacing: 1px; text-transform: uppercase;
+}
+.tm-col {
+  display: flex; flex-direction: column; align-items: stretch; justify-content: center;
+  width: 158px; flex: none;
+}
+.tm-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 9px;
+  background: #121212; color: #fff;
+  font-family: var(--sans); font-weight: 700; font-size: 13.5px;
+  padding: 13px 14px; border-radius: 12px; text-decoration: none;
+  border: 1px solid #121212; white-space: nowrap;
+  transition: transform 0.12s ease, background 0.12s ease;
+}
+.tm-btn:hover { transform: translateY(-1px); background: #000; }
+.tm-btn svg { flex: none; }
+.tm-cap { margin-top: 9px; font-size: 11px; color: var(--muted); text-align: center; line-height: 1.4; }
+.tm-cap a { color: var(--ink); text-decoration: underline; text-underline-offset: 2px; }
+
+@media (max-width: 560px) {
+  .links-row { flex-direction: column; gap: 10px; }
+  .or-sep { padding: 2px 0; }
+  .tm-col { width: 100%; }
+}
+
 .hint { font-size: 12px; color: var(--muted); margin-top: 8px; line-height: 1.5; }
 .hint strong { color: var(--ink); }
 .field-err {
