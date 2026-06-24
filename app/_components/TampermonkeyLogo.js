@@ -1,10 +1,6 @@
-// Tampermonkey mark — its two circles, in white, since the logo's black
-// squircle would disappear against the black button.
+// Official Tampermonkey mark (Simple Icons), inverted to white so it reads on
+// the black button — the circle cut-outs show the button through as dark.
 export default function TampermonkeyLogo() {
-  return (
-    <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
-      <circle cx="8.7" cy="14.8" r="4.15" fill="#fff" />
-      <circle cx="16.2" cy="14.8" r="4.15" fill="#fff" />
-    </svg>
-  );
+  // eslint-disable-next-line @next/next/no-img-element
+  return <img src="/tampermonkey.svg" alt="" className="tm-logo" width={18} height={18} />;
 }
