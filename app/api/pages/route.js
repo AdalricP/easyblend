@@ -1,12 +1,21 @@
 import { NextResponse } from "next/server";
 import crypto from "node:crypto";
-import { getPageByUsername, createPage } from "@/lib/db";
+import { getPageByUsername, createPage, rateLimit } from "@/lib/db";
 import { RESERVED, isValidHandle, isValidEmail, parseLinks } from "@/lib/util";
+import { clientIp } from "@/lib/auth";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export async function POST(req) {
+  // Throttle page creation per IP to curb spam / squatting.
+  const rl = await rateLimit({ bucket: "create", ip: clientIp(req), limit: 10, windowSec: 60 });
+  if (!rl.allowed)
+    return NextResponse.json(
+      { error: "Too many requests. Try again in a minute." },
+      { status: 429, headers: { "Retry-After": String(rl.resetSec) } }
+    );
+
   let body;
   try {
     body = await req.json();

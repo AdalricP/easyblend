@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
-import { getPageByUsername, consumeLink, markNotified } from "@/lib/db";
+import { getPageByUsername, consumeLink, markNotified, rateLimit } from "@/lib/db";
 import { RESERVED } from "@/lib/util";
+import { clientIp } from "@/lib/auth";
 import { sendRefillEmail } from "@/lib/email";
 
 export const runtime = "nodejs";
@@ -13,6 +14,14 @@ export async function POST(req, { params }) {
   const handle = params.username;
   if (RESERVED.has(handle.toLowerCase()))
     return NextResponse.json({ error: "Not found" }, { status: 404 });
+
+  // Throttle per IP to curb scripted pool-draining.
+  const rl = await rateLimit({ bucket: "consume", ip: clientIp(req), limit: 20, windowSec: 60 });
+  if (!rl.allowed)
+    return NextResponse.json(
+      { error: "Too many requests. Slow down a moment." },
+      { status: 429, headers: { "Retry-After": String(rl.resetSec) } }
+    );
 
   const page = await getPageByUsername(handle);
   if (!page) return NextResponse.json({ error: "Not found" }, { status: 404 });

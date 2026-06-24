@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
-import { getPageByUsername, updatePage } from "@/lib/db";
+import { getPageByUsername, updatePage, rateLimit } from "@/lib/db";
 import { isValidEmail, parseLinks } from "@/lib/util";
-import { safeEqual } from "@/lib/auth";
+import { safeEqual, clientIp } from "@/lib/auth";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -26,6 +26,13 @@ export async function GET(req, { params }) {
 }
 
 export async function PUT(req, { params }) {
+  const rl = await rateLimit({ bucket: "manage", ip: clientIp(req), limit: 30, windowSec: 60 });
+  if (!rl.allowed)
+    return NextResponse.json(
+      { error: "Too many requests. Try again shortly." },
+      { status: 429, headers: { "Retry-After": String(rl.resetSec) } }
+    );
+
   const page = await getPageByUsername(params.username);
   if (!page) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
