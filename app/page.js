@@ -68,11 +68,8 @@ export default function CreatePage() {
       <Wordmark />
       <div className="hero">
         {spots && (
-          <div className={`spots ${full ? "full" : ""}`}>
-            <span className="dot" />
-            {full
-              ? `Full — all ${spots.max} spots taken`
-              : `${spots.remaining} of ${spots.max} spots left`}
+          <div className="spots">
+            {spots.remaining}/{spots.max} spots left
           </div>
         )}
         <h1>One link to a fresh blend.</h1>
