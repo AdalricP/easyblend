@@ -72,7 +72,6 @@ export default function CreatePage() {
             {spots.remaining}/{spots.max} spots left
           </div>
         )}
-        <h1>One link to a fresh blend.</h1>
       </div>
 
       <form className="panel" onSubmit={submit}>
@@ -138,6 +137,11 @@ export default function CreatePage() {
 
       <p className="footnote">
         <a href="/recover">Forgor account details</a>
+      </p>
+
+      <p className="made-note">
+        I was trying to get to 100 blends and it was annoying to copy the link everytime so I
+        just made this
       </p>
     </div>
   );

@@ -195,6 +195,15 @@ input:focus, textarea:focus { border-color: var(--green); box-shadow: 0 0 0 3px 
 .footnote { color: var(--muted); font-size: 13px; margin-top: 20px; text-align: center; }
 .footnote a { color: var(--ink); font-weight: 600; text-decoration: underline; text-underline-offset: 2px; }
 
+.made-note {
+  max-width: 360px;
+  margin: 30px auto 0;
+  text-align: center;
+  font-size: 11.5px;
+  line-height: 1.5;
+  color: #9a9a9a;
+}
+
 /* ── Copy boxes ────────────────────────────────────────────────────────── */
 .copybox {
   display: flex; gap: 8px; align-items: center;
