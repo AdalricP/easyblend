@@ -126,9 +126,12 @@ export default function CreatePage() {
             />
             <div className="or-sep">or</div>
             <div className="tm-col">
-              <a className="tm-btn" href={TM_INSTALL_URL} target="_blank" rel="noreferrer">
+              <a className="tm-btn" href="/easyblend.user.js" target="_blank" rel="noreferrer">
                 Use Tampermonkey
                 <TampermonkeyLogo />
+              </a>
+              <a className="tm-sub" href={TM_INSTALL_URL} target="_blank" rel="noreferrer">
+                install here
               </a>
             </div>
           </div>
