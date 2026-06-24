@@ -155,34 +155,56 @@ export default function CreatePage() {
         <div className="field">
           <label htmlFor="links">Spotify Blend invite links</label>
           <div className="links-row">
-            <textarea
-              id="links"
-              placeholder={"https://spotify.link/abc123\nhttps://spotify.link/def456\nhttps://spotify.link/ghi789"}
-              value={links}
-              onChange={(e) => setLinks(e.target.value)}
-            />
+            <div className="manual-col">
+              <span className="manual-label">Enter manually</span>
+              <textarea
+                id="links"
+                placeholder={"https://spotify.link/abc123\nhttps://spotify.link/def456\nhttps://spotify.link/ghi789"}
+                value={links}
+                onChange={(e) => setLinks(e.target.value)}
+              />
+            </div>
             <div className="or-sep">or</div>
             <div className="tm-col">
-              {scriptInstalled ? (
-                <a className="tm-btn go" href={BLEND_INVITE_URL} target="_blank" rel="noreferrer">
-                  <span className="tm-fill" />
-                  <span className="tm-content">
-                    <SpotifyLogo />
-                    Go Spotify
-                  </span>
-                </a>
-              ) : (
-                <>
-                  <a className="tm-btn" href={TM_INSTALL_URL} target="_blank" rel="noreferrer">
+              <a
+                className={`tm-btn${scriptInstalled ? " go" : ""}`}
+                href={scriptInstalled ? BLEND_INVITE_URL : TM_INSTALL_URL}
+                target="_blank"
+                rel="noreferrer"
+              >
+                {scriptInstalled ? (
+                  <>
+                    <span className="tm-fill" />
+                    <span className="tm-content">
+                      <SpotifyLogo />
+                      <span>Spotify w/ Tampermonkey</span>
+                    </span>
+                  </>
+                ) : (
+                  <>
                     Install Tampermonkey
                     <TampermonkeyLogo />
-                  </a>
-                  <span className="tm-then">then</span>
-                  <a className="tm-script" href="/easyblend.user.js" target="_blank" rel="noreferrer">
-                    Add the script
-                  </a>
-                </>
-              )}
+                  </>
+                )}
+              </a>
+              <div className={`tm-extras${scriptInstalled ? " gone" : ""}`}>
+                <span className="tm-then">then</span>
+                <a className="tm-script" href="/easyblend.user.js" target="_blank" rel="noreferrer">
+                  Add the script
+                </a>
+                <details className="tm-help">
+                  <summary>installed but not running?</summary>
+                  <div>
+                    Chrome / Brave / Edge block userscripts by default:
+                    <ol>
+                      <li>open <code>…/extensions</code></li>
+                      <li>Tampermonkey → <strong>Details</strong></li>
+                      <li>turn on <strong>Allow user scripts</strong></li>
+                      <li>reload this page</li>
+                    </ol>
+                  </div>
+                </details>
+              </div>
             </div>
           </div>
           <LinkStatus
