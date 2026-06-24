@@ -1,12 +1,11 @@
 import "./globals.css";
-import { Fraunces, Space_Mono } from "next/font/google";
+import { Figtree, Space_Mono } from "next/font/google";
 import Doodles from "./_components/Doodles";
 
-const display = Fraunces({
+const sans = Figtree({
   subsets: ["latin"],
-  variable: "--font-display",
+  variable: "--font-sans",
   display: "swap",
-  axes: ["opsz", "SOFT", "WONK"],
 });
 
 const mono = Space_Mono({
@@ -24,7 +23,7 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className={`${display.variable} ${mono.variable}`}>
+    <html lang="en" className={`${sans.variable} ${mono.variable}`}>
       <body>
         <Doodles />
         {children}

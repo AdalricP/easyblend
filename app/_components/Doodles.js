@@ -2,11 +2,12 @@
 // decorative: fixed behind content, non-interactive, hidden for reduced motion
 // folks via CSS. Stroke-based so they read as sketched, not clip-art.
 export default function Doodles() {
-  const ink = "#211E1C";
-  const coral = "#FF5A3C";
-  const mustard = "#F5B23D";
-  const blue = "#2E7DD1";
-  const green = "#3FA34D";
+  // Spotify palette on dark: greens + white outlines so they pop on #121212.
+  const ink = "#ffffff";
+  const coral = "#1ed760";
+  const mustard = "#ffffff";
+  const blue = "#1db954";
+  const green = "#1ed760";
   const s = { fill: "none", strokeWidth: 3, strokeLinecap: "round", strokeLinejoin: "round" };
 
   return (

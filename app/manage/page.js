@@ -92,7 +92,10 @@ export default function ManagePage() {
         <Wordmark />
         <h1>Can&apos;t open this.</h1>
         <p className="lede">{error}</p>
-        <a className="btn" href="/">Back to easyblend</a>
+        <a className="btn" href="/recover">Email me my manage link</a>
+        <p className="footnote">
+          <a href="/">← Back to easyblend</a>
+        </p>
       </div>
     );
   }

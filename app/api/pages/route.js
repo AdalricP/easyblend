@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import crypto from "node:crypto";
-import { getPageByUsername, createPage, rateLimit } from "@/lib/db";
+import { getPageByUsername, createPage, rateLimit, countPages, maxSpots } from "@/lib/db";
 import { RESERVED, isValidHandle, isValidEmail, parseLinks } from "@/lib/util";
 import { clientIp } from "@/lib/auth";
 
@@ -57,6 +57,14 @@ export async function POST(req) {
 
   if (await getPageByUsername(handle))
     return NextResponse.json({ error: "That username is already taken." }, { status: 409 });
+
+  // Global cap: only N spots exist.
+  const max = maxSpots();
+  if ((await countPages()) >= max)
+    return NextResponse.json(
+      { error: `easyblend is full — all ${max} spots are taken.`, full: true },
+      { status: 403 }
+    );
 
   const editToken = crypto.randomBytes(24).toString("hex");
   try {

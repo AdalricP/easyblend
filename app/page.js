@@ -13,12 +13,17 @@ export default function CreatePage() {
   const [busy, setBusy] = useState(false);
   const [result, setResult] = useState(null);
   const [origin, setOrigin] = useState("");
+  const [spots, setSpots] = useState(null);
 
   // Prefill the username if someone arrived via a "claim this" link.
   useEffect(() => {
     setOrigin(window.location.origin);
     const claim = new URLSearchParams(window.location.search).get("claim");
     if (claim) setHandle(claim);
+    fetch("/api/spots")
+      .then((r) => r.json())
+      .then(setSpots)
+      .catch(() => {});
   }, []);
 
   async function submit(e) {
@@ -46,6 +51,7 @@ export default function CreatePage() {
 
   const parsed = parseLinks(links);
   const linksReady = parsed.valid.length > 0 && parsed.invalid.length === 0;
+  const full = spots?.full;
 
   if (result) {
     return (
@@ -60,6 +66,14 @@ export default function CreatePage() {
     <div className="wrap">
       <Wordmark />
       <div className="hero">
+        {spots && (
+          <div className={`spots ${full ? "full" : ""}`}>
+            <span className="dot" />
+            {full
+              ? `Full — all ${spots.max} spots taken`
+              : `${spots.remaining} of ${spots.max} spots left`}
+          </div>
+        )}
         <h1>One link to a fresh blend.</h1>
         <p className="lede">
           Claim your page, drop in your Spotify Blend invites, and share a single link.
@@ -122,13 +136,13 @@ export default function CreatePage() {
           />
         </div>
 
-        <button className="btn block" type="submit" disabled={busy || !linksReady}>
-          {busy ? "Creating…" : "Create my page"}
+        <button className="btn block" type="submit" disabled={busy || !linksReady || full}>
+          {busy ? "Creating…" : full ? "All spots taken" : "Create my page"}
         </button>
       </form>
 
       <p className="footnote">
-        Already have one? Use the private manage link you got when you created it.
+        Lost your manage link? <a href="/recover">Recover it</a>.
       </p>
     </div>
   );
