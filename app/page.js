@@ -140,8 +140,10 @@ export default function CreatePage() {
       </p>
 
       <p className="made-note">
-        I was trying to get to 100 blends and it was annoying to copy the link everytime so I
-        just made this
+        <a href="/meme.jpg">
+          I was trying to get to 100 blends and it was annoying to copy the link everytime so
+          I just made this
+        </a>
       </p>
     </div>
   );
