@@ -1,11 +1,12 @@
 // ==UserScript==
 // @name         easyblend · grab blend links
 // @namespace    https://easyblend.xyz
-// @version      0.3.0
+// @version      0.3.1
 // @description  Grab up to 10 fresh Spotify Blend invite links to paste into easyblend.xyz
 // @author       easyblend
 // @match        https://open.spotify.com/blend/invitation*
 // @match        https://easyblend.xyz/*
+// @match        https://*.easyblend.xyz/*
 // @icon         https://easyblend.xyz/favicon.ico
 // @run-at       document-start
 // @grant        none
@@ -13,12 +14,14 @@
 
 (function () {
   "use strict";
-  const VERSION = "0.3.0";
+  const VERSION = "0.3.1";
 
   // ── On easyblend: announce presence so the site can detect the script ──
   if (location.hostname.indexOf("easyblend") !== -1) {
+    console.log("[easyblend] userscript v" + VERSION + " active on " + location.hostname);
     try { window.__EASYBLEND_USERSCRIPT__ = VERSION; } catch (e) {}
     try { document.documentElement.setAttribute("data-eb-userscript", VERSION); } catch (e) {}
+    try { localStorage.setItem("eb_userscript", VERSION); } catch (e) {}
     const announce = function () {
       try {
         window.dispatchEvent(new CustomEvent("easyblend:userscript", { detail: VERSION }));
@@ -37,6 +40,7 @@
   const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
   function init() {
+    console.log("[easyblend] userscript v" + VERSION + " active on the Spotify blend page");
     const panel = document.createElement("div");
     panel.style.cssText =
       "position:fixed;top:16px;right:16px;z-index:99999;width:300px;background:#fff;color:#121212;" +

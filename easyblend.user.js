@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         easyblend · grab blend links
 // @namespace    https://easyblend.xyz
-// @version      0.2.0
+// @version      0.3.0
 // @description  Grab up to 10 fresh Spotify Blend invite links to paste into easyblend.xyz
 // @author       easyblend
 // @match        https://open.spotify.com/blend/invitation*
@@ -13,7 +13,7 @@
 
 (function () {
   "use strict";
-  const VERSION = "0.2.0";
+  const VERSION = "0.3.0";
 
   // ── On easyblend: announce presence so the site can detect the script ──
   if (location.hostname.indexOf("easyblend") !== -1) {
@@ -32,6 +32,7 @@
   // ── On Spotify's blend invite page: inject the grabber ─────────────────
   const MAX = 10;
   const GAP = 1000; // 1s cooldown between clicks
+  // Pull just the URL out of "ABCD invited you to a Spotify Blend <link>"
   const SPOTIFY_LINK = /https?:\/\/(?:spotify\.link|open\.spotify\.com)\/[^\s"'<>]+/i;
   const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
@@ -69,23 +70,48 @@
         const m = (inp.value || "").match(SPOTIFY_LINK);
         if (m) return m[0];
       }
-      const m = (document.body.innerText || "").match(SPOTIFY_LINK);
-      return m ? m[0] : null;
+      return null;
     }
 
     async function grab() {
       const seen = new Set();
+      const captured = [];
+
+      // Intercept what Spotify writes to the clipboard on each Copy click — far
+      // more reliable than reading the clipboard in a loop (browsers block that).
+      let origWrite = null;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        origWrite = navigator.clipboard.writeText.bind(navigator.clipboard);
+        navigator.clipboard.writeText = function (text) {
+          captured.push(String(text));
+          return origWrite(text);
+        };
+      }
+      const onCopy = (e) => {
+        try {
+          const t = (e.clipboardData || window.clipboardData).getData("text");
+          if (t) captured.push(String(t));
+        } catch (err) {}
+      };
+      document.addEventListener("copy", onCopy, true);
+
       const btn = findCopyButton();
       if (!btn) status.textContent = "⚠ Couldn't find the Copy button — UI may have changed.";
       for (let i = 0; i < MAX; i++) {
         status.textContent = "Grabbing " + (i + 1) + "/" + MAX + "…";
         if (btn) btn.click();
         await sleep(GAP);
-        let link = findLinkInDom();
-        if (!link) {
-          try { link = await navigator.clipboard.readText(); } catch (e) {}
-        }
-        const m = link && link.match(SPOTIFY_LINK);
+        const domLink = findLinkInDom();
+        if (domLink) captured.push(domLink);
+      }
+
+      // restore originals
+      if (origWrite) navigator.clipboard.writeText = origWrite;
+      document.removeEventListener("copy", onCopy, true);
+
+      // strip the "invited you to a blend" text, keep only the URL, dedupe
+      for (const c of captured) {
+        const m = c.match(SPOTIFY_LINK);
         if (m) seen.add(m[0]);
       }
       const list = [...seen];
@@ -94,7 +120,7 @@
       copyBtn.style.display = list.length ? "block" : "none";
       status.textContent = list.length
         ? "Got " + list.length + " link" + (list.length === 1 ? "" : "s") + " — paste them into easyblend."
-        : "No links captured. Spotify's markup may have changed.";
+        : "No links captured. Tell the maker what the Copy button looks like.";
     }
 
     panel.querySelector("#eb-go").addEventListener("click", grab);
