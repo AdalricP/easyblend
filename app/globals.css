@@ -207,6 +207,24 @@ input:focus, textarea:focus { border-color: var(--green); box-shadow: 0 0 0 3px 
 }
 .tm-sub:hover { color: var(--green); }
 
+/* installed → "Go Spotify": green wipes up from the bottom, content fades in */
+.tm-btn.go { position: relative; overflow: hidden; background: #121212; color: #000; border-color: #121212; }
+.tm-btn.go:hover { background: #121212; color: #000; }
+.tm-fill {
+  position: absolute; inset: 0; background: var(--green);
+  transform: scaleY(0); transform-origin: bottom;
+  animation: riseFill 0.5s cubic-bezier(0.2, 0.7, 0.2, 1) forwards;
+}
+.tm-btn.go:hover .tm-fill { background: var(--green-bright); }
+.tm-btn.go .tm-content {
+  position: relative; z-index: 1;
+  display: inline-flex; align-items: center; gap: 10px;
+  opacity: 0; animation: fadeUp 0.35s ease 0.26s forwards;
+}
+.tm-btn.go .tm-content svg { fill: #000; }
+@keyframes riseFill { to { transform: scaleY(1); } }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
 @media (max-width: 560px) {
   .links-row { flex-direction: column; gap: 10px; }
   .or-sep { padding: 2px 0; }

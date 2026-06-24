@@ -4,9 +4,11 @@ import { useEffect, useState } from "react";
 import Wordmark from "./_components/Wordmark";
 import LinkStatus from "./_components/LinkStatus";
 import TampermonkeyLogo from "./_components/TampermonkeyLogo";
+import SpotifyLogo from "./_components/SpotifyLogo";
 import { parseLinks, isValidHandle, MAX_LINKS } from "@/lib/util";
 
 const TM_INSTALL_URL = "https://www.tampermonkey.net/";
+const BLEND_INVITE_URL = "https://open.spotify.com/blend/invitation";
 
 export default function CreatePage() {
   const [handle, setHandle] = useState("");
@@ -17,6 +19,41 @@ export default function CreatePage() {
   const [result, setResult] = useState(null);
   const [origin, setOrigin] = useState("");
   const [spots, setSpots] = useState(null);
+  const [scriptInstalled, setScriptInstalled] = useState(false);
+
+  // Detect our userscript — it tags the page when it runs on easyblend. (We can
+  // detect our own script reliably; the bare extension is undetectable.) A short
+  // delay lets the black button show first, so the flip-to-green reads as a change.
+  useEffect(() => {
+    let flipped = false;
+    const has = () =>
+      !!document.documentElement.getAttribute("data-eb-userscript") ||
+      !!window.__EASYBLEND_USERSCRIPT__;
+    const flip = () => {
+      if (flipped) return;
+      flipped = true;
+      setTimeout(() => setScriptInstalled(true), 600);
+    };
+    if (has()) {
+      flip();
+      return;
+    }
+    const onEvent = () => flip();
+    window.addEventListener("easyblend:userscript", onEvent);
+    let n = 0;
+    const id = setInterval(() => {
+      if (has()) {
+        flip();
+        clearInterval(id);
+      } else if (++n > 8) {
+        clearInterval(id);
+      }
+    }, 300);
+    return () => {
+      window.removeEventListener("easyblend:userscript", onEvent);
+      clearInterval(id);
+    };
+  }, []);
 
   // Prefill the username if someone arrived via a "claim this" link.
   useEffect(() => {
@@ -126,13 +163,25 @@ export default function CreatePage() {
             />
             <div className="or-sep">or</div>
             <div className="tm-col">
-              <a className="tm-btn" href="/easyblend.user.js" target="_blank" rel="noreferrer">
-                Use Tampermonkey
-                <TampermonkeyLogo />
-              </a>
-              <a className="tm-sub" href={TM_INSTALL_URL} target="_blank" rel="noreferrer">
-                install here
-              </a>
+              {scriptInstalled ? (
+                <a className="tm-btn go" href={BLEND_INVITE_URL} target="_blank" rel="noreferrer">
+                  <span className="tm-fill" />
+                  <span className="tm-content">
+                    <SpotifyLogo />
+                    Go Spotify
+                  </span>
+                </a>
+              ) : (
+                <>
+                  <a className="tm-btn" href="/easyblend.user.js" target="_blank" rel="noreferrer">
+                    Use Tampermonkey
+                    <TampermonkeyLogo />
+                  </a>
+                  <a className="tm-sub" href={TM_INSTALL_URL} target="_blank" rel="noreferrer">
+                    install here
+                  </a>
+                </>
+              )}
             </div>
           </div>
           <LinkStatus
