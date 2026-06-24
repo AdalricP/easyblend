@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BlendBox</title>
+  <style>
+    :root {
+      --bg: #0a0a0a;
+      --fg: #ffffff;
+      --muted: #a0a0a0;
+      --green: #1db954;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: radial-gradient(circle at 50% 0%, #14361f 0%, var(--bg) 55%);
+      color: var(--fg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 24px;
+    }
+    .card {
+      max-width: 460px;
+      width: 100%;
+    }
+    .logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      margin-bottom: 28px;
+    }
+    .logo svg { width: 30px; height: 30px; }
+    h1 {
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      margin-bottom: 12px;
+      line-height: 1.2;
+    }
+    p {
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.5;
+      margin-bottom: 24px;
+    }
+    .spinner {
+      width: 34px;
+      height: 34px;
+      border: 3px solid rgba(255,255,255,0.15);
+      border-top-color: var(--green);
+      border-radius: 50%;
+      margin: 0 auto 22px;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .btn {
+      display: inline-block;
+      background: var(--green);
+      color: #fff;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 15px;
+      padding: 13px 26px;
+      border-radius: 999px;
+      transition: transform 0.12s ease, background 0.12s ease;
+    }
+    .btn:hover { background: #1ed760; transform: scale(1.03); }
+    .name { color: var(--green); font-weight: 600; }
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="logo">
+      <svg viewBox="0 0 24 24" fill="var(--green)" aria-hidden="true">
+        <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.5 17.3a.75.75 0 0 1-1.03.25c-2.82-1.72-6.37-2.11-10.55-1.16a.75.75 0 1 1-.33-1.46c4.57-1.04 8.5-.59 11.66 1.34.36.22.47.69.25 1.03zm1.47-3.27a.94.94 0 0 1-1.29.31c-3.23-1.98-8.15-2.56-11.97-1.4a.94.94 0 1 1-.54-1.8c4.36-1.32 9.78-.68 13.49 1.6.44.27.58.85.31 1.29zm.13-3.4C15.73 8.27 8.9 8.05 5.1 9.2a1.12 1.12 0 1 1-.65-2.15c4.37-1.33 11.9-1.07 16.07 1.4a1.13 1.13 0 0 1-1.15 1.94z"/>
+      </svg>
+      BlendBox
+    </div>
+
+    <!-- Redirecting state -->
+    <div id="redirecting" class="hidden">
+      <div class="spinner"></div>
+      <h1>Opening your blend…</h1>
+      <p>Taking <span class="name" id="who"></span> to Spotify.</p>
+      <a class="btn" id="manual" href="#">Open Spotify</a>
+    </div>
+
+    <!-- Landing / not-found state -->
+    <div id="landing" class="hidden">
+      <h1>Your blend, one link away.</h1>
+      <p>This link doesn't match a blend yet. Make sure you're using your personal BlendBox link.</p>
+    </div>
+  </div>
+
+  <script>
+    // ─────────────────────────────────────────────────────────────
+    //  POPULATE THIS LIST
+    //  One entry per person. The `key` is what goes in the URL:
+    //     yoursite.com/?p=aryan   →   redirects to that person's blend.
+    //  Keys are matched case-insensitively.
+    // ─────────────────────────────────────────────────────────────
+    const BLENDS = [
+      // { key: "aryan", name: "Aryan", url: "https://open.spotify.com/playlist/XXXXXXXXXXXX" },
+      // { key: "sam",   name: "Sam",   url: "https://open.spotify.com/playlist/YYYYYYYYYYYY" },
+    ];
+
+    // ── Logic ──────────────────────────────────────────────────────
+    function getKey() {
+      const params = new URLSearchParams(window.location.search);
+      // Supports ?p=name  or  ?name=name, plus #name as a fallback.
+      const fromQuery = params.get("p") || params.get("name");
+      const fromHash = window.location.hash.replace(/^#/, "");
+      return (fromQuery || fromHash || "").trim().toLowerCase();
+    }
+
+    function findBlend(key) {
+      if (!key) return null;
+      return BLENDS.find(b => b.key.toLowerCase() === key) || null;
+    }
+
+    function show(id) {
+      document.getElementById(id).classList.remove("hidden");
+    }
+
+    const blend = findBlend(getKey());
+
+    if (blend) {
+      document.getElementById("who").textContent = blend.name || blend.key;
+      document.getElementById("manual").href = blend.url;
+      show("redirecting");
+      // Small delay so the user sees what's happening, then redirect.
+      setTimeout(() => { window.location.replace(blend.url); }, 900);
+    } else {
+      show("landing");
+    }
+  </script>
+</body>
+</html>
