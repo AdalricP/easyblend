@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getPageByUsername, updatePage } from "@/lib/db";
-import { normalizeLinks } from "@/lib/util";
+import { isValidEmail, normalizeLinks } from "@/lib/util";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -17,8 +17,9 @@ export async function GET(req, { params }) {
 
   return NextResponse.json({
     handle: page.handle,
-    displayName: page.display_name,
+    email: page.email,
     links: page.links.map((l) => l.url),
+    remaining: page.links.length,
     visits: Number(page.visits),
   });
 }
@@ -37,14 +38,17 @@ export async function PUT(req, { params }) {
   if ((body || {}).token !== page.edit_token)
     return NextResponse.json({ error: "Invalid edit token" }, { status: 403 });
 
+  if (!isValidEmail(body.email))
+    return NextResponse.json({ error: "Enter a valid email." }, { status: 400 });
+
   const cleanLinks = normalizeLinks(body.links);
   if (cleanLinks.length === 0)
     return NextResponse.json({ error: "Add at least one valid link." }, { status: 400 });
 
   await updatePage(page.id, {
-    displayName: (body.displayName || "").slice(0, 80),
+    email: body.email.trim(),
     links: cleanLinks,
   });
 
-  return NextResponse.json({ ok: true });
+  return NextResponse.json({ ok: true, remaining: cleanLinks.length });
 }

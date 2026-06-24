@@ -1,11 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Logo from "./_components/Logo";
+import Wordmark from "./_components/Wordmark";
 
 export default function CreatePage() {
   const [handle, setHandle] = useState("");
-  const [displayName, setDisplayName] = useState("");
+  const [email, setEmail] = useState("");
   const [links, setLinks] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
@@ -27,7 +27,7 @@ export default function CreatePage() {
       const res = await fetch("/api/pages", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ handle, displayName, links }),
+        body: JSON.stringify({ handle, email, links }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -45,7 +45,7 @@ export default function CreatePage() {
   if (result) {
     return (
       <div className="wrap">
-        <Logo />
+        <Wordmark />
         <Success result={result} origin={origin} />
       </div>
     );
@@ -53,12 +53,12 @@ export default function CreatePage() {
 
   return (
     <div className="wrap">
-      <Logo />
+      <Wordmark />
       <div className="hero">
         <h1>One link to a fresh blend.</h1>
         <p className="lede">
-          Claim your BlendBox, drop in your Spotify Blend invites, and share a single
-          link. Every visitor gets handed a fresh blend with you — automatically.
+          Claim your page, drop in your Spotify Blend invites, and share a single link.
+          Each invite is handed out once — when the pool runs dry we email you to refill.
         </p>
       </div>
 
@@ -66,9 +66,9 @@ export default function CreatePage() {
         {error && <div className="error">{error}</div>}
 
         <div className="field">
-          <label htmlFor="handle">Your BlendBox link</label>
+          <label htmlFor="handle">Your easyblend link</label>
           <div className="url-prefix">
-            <span>{(origin || "blendbox.xyz").replace(/^https?:\/\//, "")}/</span>
+            <span>{(origin || "easyblend.xyz").replace(/^https?:\/\//, "")}/</span>
             <input
               id="handle"
               type="text"
@@ -84,14 +84,18 @@ export default function CreatePage() {
         </div>
 
         <div className="field">
-          <label htmlFor="display">Display name <span style={{ fontWeight: 400 }}>(optional)</span></label>
+          <label htmlFor="email">Email</label>
           <input
-            id="display"
-            type="text"
-            placeholder="How your name shows on the redirect screen"
-            value={displayName}
-            onChange={(e) => setDisplayName(e.target.value)}
+            id="email"
+            type="email"
+            placeholder="you@email.com"
+            value={email}
+            autoCapitalize="off"
+            autoCorrect="off"
+            spellCheck={false}
+            onChange={(e) => setEmail(e.target.value)}
           />
+          <p className="hint">We&apos;ll email you when your last invite is claimed so you can refill.</p>
         </div>
 
         <div className="field">
@@ -103,14 +107,13 @@ export default function CreatePage() {
             onChange={(e) => setLinks(e.target.value)}
           />
           <p className="hint">
-            One link per line. In Spotify, open your Blend → <strong>Invite</strong> →
-            copy link, and paste a batch here. Visitors are rotated through the pool so
-            each gets a fresh one.
+            One link per line. In Spotify, open your Blend → <strong>Invite</strong> → copy
+            link, and paste a batch here. Each is used once, then removed.
           </p>
         </div>
 
         <button className="btn block" type="submit" disabled={busy}>
-          {busy ? "Creating…" : "Create my BlendBox"}
+          {busy ? "Creating…" : "Create my page"}
         </button>
       </form>
 
@@ -126,9 +129,10 @@ function Success({ result, origin }) {
   const manageUrl = `${origin}${result.manageUrl}`;
   return (
     <div className="panel">
-      <h1 style={{ fontSize: 24 }}>🎉 You're live</h1>
+      <h1 style={{ fontSize: 24 }}>You&apos;re live.</h1>
       <p className="lede" style={{ marginBottom: 18 }}>
-        Share this link anywhere — it hands out a fresh blend each time.
+        Share this link anywhere — it hands out a fresh blend each time, until the pool
+        runs out.
       </p>
 
       <label>Your public link</label>
@@ -137,17 +141,17 @@ function Success({ result, origin }) {
       <label style={{ marginTop: 18 }}>Private manage link — save this!</label>
       <CopyBox value={manageUrl} muted />
       <div className="warn">
-        ⚠️ This is the only way to edit or add links later. We can't recover it — bookmark it now.
+        This is the only way to edit or add links later. We can&apos;t recover it — bookmark it now.
       </div>
 
       <div className="row">
-        <a className="btn" href={result.url} target="_blank" rel="noreferrer">
-          Test redirect ↗
-        </a>
-        <a className="btn btn-ghost" href={result.manageUrl}>
+        <a className="btn block" href={result.manageUrl}>
           Manage links
         </a>
       </div>
+      <p className="hint" style={{ textAlign: "center", marginTop: 12 }}>
+        Heads up: opening your public link uses one invite.
+      </p>
     </div>
   );
 }

@@ -1,21 +1,66 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
-export default function Interstitial({ url, who }) {
+export default function Interstitial({ handle }) {
+  const [state, setState] = useState("loading"); // loading | empty | error
+  const [url, setUrl] = useState(null);
+
   useEffect(() => {
-    const t = setTimeout(() => window.location.replace(url), 900);
-    return () => clearTimeout(t);
-  }, [url]);
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch(`/api/pages/${encodeURIComponent(handle)}/next`, {
+          method: "POST",
+        });
+        const data = await res.json();
+        if (cancelled) return;
+        if (res.ok && data.url) {
+          setUrl(data.url);
+          setTimeout(() => window.location.replace(data.url), 650);
+        } else {
+          setState("empty");
+        }
+      } catch {
+        if (!cancelled) setState("error");
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [handle]);
+
+  if (state === "empty") {
+    return (
+      <>
+        <h1>All blends claimed.</h1>
+        <p className="lede">
+          Every invite on this page has been used. The owner&apos;s been emailed to add
+          more — check back soon.
+        </p>
+      </>
+    );
+  }
+
+  if (state === "error") {
+    return (
+      <>
+        <h1>Something went wrong.</h1>
+        <p className="lede">Please refresh to try again.</p>
+      </>
+    );
+  }
 
   return (
     <>
       <div className="spinner" />
-      <h1>Opening your blend…</h1>
-      <p className="lede">
-        Taking you to a fresh blend with <span className="name">{who}</span> on Spotify.
-      </p>
-      <a className="btn" href={url}>Open Spotify</a>
+      <h1>Opening a fresh blend…</h1>
+      <p className="lede">Taking you to Spotify.</p>
+      {url && (
+        <a className="btn" href={url}>
+          Open Spotify
+        </a>
+      )}
     </>
   );
 }

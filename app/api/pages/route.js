@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import crypto from "node:crypto";
 import { getPageByUsername, createPage } from "@/lib/db";
-import { RESERVED, isValidHandle, normalizeLinks } from "@/lib/util";
+import { RESERVED, isValidHandle, isValidEmail, normalizeLinks } from "@/lib/util";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -14,7 +14,7 @@ export async function POST(req) {
     return NextResponse.json({ error: "Invalid request." }, { status: 400 });
   }
 
-  const { handle, displayName, links } = body || {};
+  const { handle, email, links } = body || {};
 
   if (!handle || !isValidHandle(handle))
     return NextResponse.json(
@@ -24,6 +24,12 @@ export async function POST(req) {
 
   if (RESERVED.has(handle.toLowerCase()))
     return NextResponse.json({ error: "That username is reserved." }, { status: 400 });
+
+  if (!isValidEmail(email))
+    return NextResponse.json(
+      { error: "Enter a valid email so we can tell you when to refill." },
+      { status: 400 }
+    );
 
   const cleanLinks = normalizeLinks(links);
   if (cleanLinks.length === 0)
@@ -38,7 +44,7 @@ export async function POST(req) {
   const editToken = crypto.randomBytes(24).toString("hex");
   await createPage({
     handle,
-    displayName: (displayName || "").slice(0, 80),
+    email: email.trim(),
     editToken,
     links: cleanLinks,
   });
