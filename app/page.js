@@ -177,6 +177,7 @@ export default function CreatePage() {
                     Install Tampermonkey
                     <TampermonkeyLogo />
                   </a>
+                  <span className="tm-then">then</span>
                   <a className="tm-script" href="/easyblend.user.js" target="_blank" rel="noreferrer">
                     Add the script
                   </a>
